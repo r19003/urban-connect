@@ -1,0 +1,636 @@
+
+/* Basic Reset */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100%;
+}
+/* media query */
+/* General Reset for Smaller Devices */
+
+
+/* Mobile Devices (up to 600px) */
+@media only screen and (max-width: 600px) {
+    body {
+        font-size: 14px;
+    }
+
+    .header {
+        padding: 10px;
+    }
+
+    .hero-section {
+        padding: 20px;
+        text-align: center;
+    }
+
+    .intro-section, .cloud-section {
+        padding: 15px;
+        text-align: center;
+    }
+
+    .feature-cards {
+        display: block; /* Stacks the cards vertically */
+    }
+
+    .feature-card {
+        margin-bottom: 20px;
+        width: 100%;
+    }
+
+    .testimonial-carousel {
+        width: 90%;
+        margin: auto;
+    }
+
+    .video-section {
+        height: auto;
+    }
+}
+
+/* Tablets (up to 900px) */
+@media only screen and (max-width: 900px) {
+    body {
+        font-size: 16px;
+    }
+
+    .header {
+        padding: 15px;
+    }
+
+    .hero-section {
+        padding: 30px;
+    }
+
+    .intro-section, .cloud-section {
+        padding: 20px;
+    }
+
+    .feature-cards {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .feature-card {
+        margin: 10px 0;
+        width: 80%;
+        margin: auto;
+    }
+
+    .testimonial-carousel {
+        width: 70%;
+        margin: auto;
+    }
+}
+
+/* Large Devices (Desktops)
+@media only screen and (min-width: 901px) {
+    .header {
+        padding: 20px 40px;
+    }
+
+    .hero-section {
+        padding: 50px;
+    }
+
+    .intro-section, .cloud-section {
+        padding: 40px;
+    }
+
+    .feature-cards {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .testimonial-carousel {
+        width: 60%;
+        margin: auto;
+    }
+} */
+
+
+/* Video Section */
+.video-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.background-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+/* Header Styling */
+.transparent-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    position: relative;
+    z-index: 2;
+    background-color: transparent;
+    width: 100%;
+    backdrop-filter: blur(2px);
+}
+
+/* Logo Styling */
+#logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Navbar Styling */
+#components {
+    display: flex;
+    align-items: center;
+    margin-right: 2%;
+}
+
+.nav-toggle {
+    display: none; /* Hidden by default */
+    background: none;
+    border: 2px white solid;
+    padding: 5px 10px;
+    border-radius: 10px;
+    color: rgb(242, 230, 230);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Navigation Links */
+.nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 50px;
+    font-weight: 300;
+    font-size: 20px;
+    transition: all 0.3s ease;
+}
+
+.nav-links li {
+    color: white;
+    cursor: pointer;
+}
+
+.nav-links li button {
+    padding: 10px 20px;
+    background-color: #ffffff;
+    color: #000000;
+    border: none;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-links li button:hover {
+    background-color: #000000;
+    color: #ffffff;
+    margin-top: -100px;
+}
+
+/* Media Query for Small Screens */
+@media only screen and (max-width: 768px) {
+    .transparent-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nav-toggle {
+        display: block; /* Show toggle button */
+        margin-left: auto;
+    }
+
+    .nav-links {
+        display: none; /* Hidden by default */
+        flex-direction: column;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        padding: 1rem 2rem;
+    }
+
+    .nav-links li {
+        padding: 10px 0;
+        text-align: left;
+    }
+
+    #components.active .nav-links {
+        display: flex; /* Show dropdown when active */
+    }
+}
+
+/* Hero Content */
+.hero-content {
+    position: relative;
+    z-index: 200;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height:80vh;
+}
+
+/* Intro Section */
+.intro {
+    height: 100vh;
+    background: fixed url('https://wallpapers.com/images/file/white-solid-background-pumtn8lreyutu2ru.jpg') no-repeat center/cover;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 20px;
+    margin-left: 10%;
+}
+
+.intro-img img {
+    width: 60%;
+    height: 70%;
+    object-fit: cover;
+    margin-left: 14%;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.intro-text {
+    font-family: 'Arial', sans-serif;
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    text-align: justify;
+}
+
+.intro-text h6 {
+    font-size: 2rem;
+    font-weight: 400;
+    color: rgb(23, 25, 29);
+    margin-top: 2%;
+}
+
+.intro-text p {
+    font-size: 1rem;
+    line-height: 1.6;
+    font-weight: 400;
+    text-align: justify;
+    color: rgb(0, 0, 0);
+}
+    
+/* Cloud Section */
+.cloud {
+    background: fixed url(https://coachmanluxury.com/wp-content/uploads/2020/11/about-sky.png) no-repeat center center;
+    background-size: cover;
+    height: 99vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    
+}
+
+.cloud-text {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    color: rgb(0, 0, 0);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    
+}
+
+.cloud-text h5 {
+    color: #000;
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin-top: -50%;
+    margin-bottom: -20%; /* Reduced margin */
+    font-family: Mulish, sans-serif;
+    font-size: 16px;
+}
+
+.cloud-text h1 {
+    font-size: 5rem;
+    color: #787777;
+    font-weight: 600;
+    margin-bottom: 2px; /* Reduced margin */
+    font-family: Taviraj, serif;
+    margin-bottom: -25%;
+}
+
+.cloud-text h2 {
+    font-size: 5rem;
+    font-weight: 600;
+    margin-bottom: 0; /* No margin */
+    font-family: Taviraj, serif;
+}
+
+
+/* Bus Section */
+.black-section {
+    position: relative;
+    height: 50vh;
+    background-color: #111;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+}
+
+.bus {
+    width: 80%;
+    height: auto;
+    margin-top: -120vh;
+    animation: moveBus 5s forwards; /* Smooth animation */
+    animation-delay: 6s; /* Delayed animation */
+    
+}
+
+/* Keyframes for Bus Animation */
+@keyframes moveBus {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(10%);
+    }
+ 
+}
+/* why us circle cards */
+/* Circle Cards Styles */
+.circle-cards ol {
+    width: min(60rem, 90%);
+    margin-inline: auto;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+    list-style: none;
+    padding: 2rem 0;
+    counter-reset: stepnr;
+}
+
+.circle-cards li {
+    counter-increment: stepnr;
+    width: 18rem;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    position: relative;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    background-size: cover; /* Ensures the background image covers the entire circle */
+    background-position: center; /* Centers the background image */
+}
+.circle-cards li:nth-child(1) {
+    background-image: url(https://i.pinimg.com/474x/02/79/f0/0279f0bb87ea7f4b2f26a24485299ea5.jpg);
+}
+.circle-cards li::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3); /* Creates a dark overlay */
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.circle-cards li .icon,
+.circle-cards li .title,
+.circle-cards li .descr {
+    position: relative;
+    z-index: 2; /* Ensures text appears above the overlay */
+}
+
+.circle-cards li:nth-child(2) {
+    background-image: url(https://i.pinimg.com/564x/2a/65/33/2a6533162ca598ccdc4299d5927f9856.jpg);
+}
+.circle-cards li:nth-child(3) {
+    background-image: url(https://i.pinimg.com/564x/0d/d7/05/0dd705b6c8fb7a3d1a05c8fb56800bd0.jpg);
+}
+
+
+.circle-cards li:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+.circle-cards li::before {
+    content: counter(stepnr);
+    color: var(--accent-color);
+    font-size: 6rem;
+    font-weight: 700;
+    position: absolute;
+    top: -1.5rem;
+    left: -1.5rem;
+    opacity: 0.15;
+}
+
+.circle-cards li .icon {
+    font-size: 4rem;
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+}
+
+.circle-cards li .title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    color: #f4eded;
+    
+}
+
+.circle-cards li .descr {
+    font-size: 1.1rem;
+    font-weight: 300;
+    text-align: center;
+    color: #fffefe;
+    max-width: 14rem;
+}
+/* Container styling */
+.faltu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    height: 100vh;
+    width: 100%;
+    background-color: #111; /* Dark background for contrast */
+    color: #ffffff;
+    /* Uncomment for a background image if needed */
+    /* background: fixed url('https://wallpapers.com/images/file/white-solid-background-pumtn8lreyutu2ru.jpg') no-repeat center/cover; */
+}
+
+/* Text section styling */
+.faltu-text {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    text-align: justify;
+}
+
+.faltu-text h2 {
+    font-size: 2.4rem; /* Slightly adjusted for better scaling */
+    font-weight: 400;
+    color: rgb(180, 180, 180); /* A lighter grey for subtler headings */
+    margin: 0; /* Remove default margin for consistency */
+    font-family: 'Taviraj', serif;
+    line-height: 1.2; /* Improved line spacing for readability */
+}
+
+.faltu-text h2 span {
+    font-weight: 600; /* Increased weight for emphasis */
+    color: #ffffff;
+}
+
+.faltu-text p {
+    font-size: 0.9rem; /* Adjusted font size for better readability */
+    line-height: 1.6;
+    font-weight: 400;
+    text-align: justify;
+    color: rgb(220, 220, 220); /* Slightly lighter text color for readability */
+    margin-top: 10px;
+}
+
+/* Image section styling */
+.faltu-img {
+    width: 45%; /* Reduced width for balanced text and image ratio */
+    margin-left: 2%;
+    overflow: hidden;
+    border-radius: 10px; /* Rounded corners for a modern look */
+}
+
+.faltu-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image fills the container without distortion */
+    border-radius: 10px; /* Matches the parent container's border radius */
+}
+/* testmonial */
+/* Testimonial section styling */
+.testmonial {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: url('https://etimg.etb2bimg.com/photo/107150394.cms') no-repeat center center fixed;
+    background-size: cover;
+    color: #ffffff;
+    text-align: center;
+    padding: 0 20px;
+}
+
+.testmonial::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+}
+
+.testmonial-text {
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.testmonial-text h2 {
+    font-size: 2.4rem;
+    margin-bottom: 30px;
+    font-weight: 600;
+    color: #ffffff;
+    font-family: 'Taviraj', serif;
+}
+
+.carousel {
+    position: relative;
+    height: 150px; /* Adjust height as needed */
+    overflow: hidden;
+}
+
+.carousel-items {
+    position: relative;
+}
+
+.carousel-item {
+    display: none;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #e0e0e0;
+    font-weight: 300;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#item-1:checked ~ .carousel-items label[for="item-1"],
+#item-2:checked ~ .carousel-items label[for="item-2"],
+#item-3:checked ~ .carousel-items label[for="item-3"],
+#item-4:checked ~ .carousel-items label[for="item-4"] {
+    display: block;
+}
+
+.carousel-navigation {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px; /* Adjust margin as needed */
+    position: absolute;
+    bottom: 10px; /* Position at the bottom of the section */
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.nav-button {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin: 0 5px;
+    background-color: #000000; /* Black color for the navigation buttons */
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#item-1:checked ~ .carousel-navigation label[for="item-1"],
+#item-2:checked ~ .carousel-navigation label[for="item-2"],
+#item-3:checked ~ .carousel-navigation label[for="item-3"],
+#item-4:checked ~ .carousel-navigation label[for="item-4"] {
+    background-color: #e0e0e0; /* Light gray for the active button */
+}
+
+
+  

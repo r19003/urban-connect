@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geoapify Routing API Example</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <style>
+        #map { height: 600px; }
+        .bus-icon, .stop-icon {
+            width: 32px;
+            height: 32px;
+            transform: translate(-16px, -16px); /* Center the icon on the coordinates */
+        }
+        .bus-icon {
+            fill: black;
+        }
+        .stop-icon {
+            fill: red;
+        }
+        #timer {
+            font-size: 20px;
+            background: white;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            z-index: 1000;
+            text-align: center;
+            width: fit-content;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 10px;
+        }
+        #next-stop {
+            font-size: 18px;
+            margin-top: 10px;
+            text-align: center;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 50px;
+            background: white;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div id="timer">Time to reach: 00:00</div>
+    <div id="next-stop">Next stop: Calculating...</div>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map').setView([30.73975, 76.73883], 13); // Set the initial view to the start location
+
+        // Load and display map tiles from OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        // Location SVG Icon for the bus
+        const busIcon = L.divIcon({
+            html: '<svg class="bus-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 6V4c0-2.21-1.79-4-4-4H10C7.79 0 6 1.79 6 4v2C3.79 6 2 7.79 2 10v8c0 1.1.9 2 2 2v2c0 .55.45 1 1 1s1-.45 1-1v-2h10v2c0 .55.45 1 1 1s1-.45 1-1v-2c1.1 0 2-.9 2-2v-8c0-2.21-1.79-4-4-4zM10 2h4c1.1 0 2 .9 2 2v2H8V4c0-1.1.9-2 2-2zm8 16c0 .55-.45 1-1 1h-2v-2H9v2H7c-.55 0-1-.45-1-1v-3h12v3zm0-5H6v-3c0-1.1.9-2 2-2h8c1.1 0 2 .9 2 2v3z"/></svg>',
+            className: '',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
+        });
+
+        // Location SVG Icon for the stops
+        const stopIcon = L.divIcon({
+            html: '<svg class="stop-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s6.48 10 10 10 10-6.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>',
+            className: '',
+            iconSize: [24, 24],
+            iconAnchor: [12, 24]
+        });
+
+        // Geoapify API key
+        const apiKey = '1a73268b489f49cdbaebccc4903b81f8';
+
+        // Get the bus ID from the URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const busId = urlParams.get('bus');
+
+        // Define the stops based on the selected bus
+        const stops = busId === '1' ? [
+            { name: "Raghav Home", coordinates: [30.747808174015354, 76.76875720854991] },
+            { name: "Sector 17", coordinates: [30.73645, 76.77774] },
+            { name: "Chitkara", coordinates: [30.51628, 76.66057] }
+        ] : busId === '2' ? [
+            { name: "Raina Home", coordinates: [30.74500, 76.72500] },
+            { name: "Bus Stand 43", coordinates: [30.71790, 76.74347] },
+            { name: "Chitkara", coordinates: [30.51628, 76.66057] }
+        ] : busId === '3' ? [
+    { name: "43/44", coordinates: [30.71881043817011, 76.75215456886062] },
+    { name: "35/34", coordinates: [30.72276845312314, 76.7618267193689] },
+    { name: "Aroma", coordinates: [30.730702676792035, 76.77508182344779] },
+    { name: "22/17", coordinates: [30.736304200801563, 76.77762468248413] },
+    { name: "16/17", coordinates: [30.746800541548097, 76.77690944369971] },
+    { name: "R/Garden", coordinates: [30.7533240144295, 76.80318426682383] },
+    { name: "16/10 Hospital", coordinates: [30.74899790782094, 76.78463406316625] },
+    { name: "OPD", coordinates: [30.762307237971626, 76.78186218112053] },
+    { name: "PGI", coordinates: [30.760705429404684, 76.77497429200771] },
+    { name: "Khuda Lahora", coordinates: [30.77882435166121, 76.77727742531765] },
+    { name: "S/P Barrier", coordinates: [30.786319339200706, 76.75653427116416] },
+    { name: "Dhanas", coordinates: [30.76261029138625, 76.74537149746155] },
+    { name: "DMC", coordinates: [30.763417840136338, 76.73385764743266] },
+    { name: "38west", coordinates: [30.748213424927606, 76.73553435364875] },
+    { name: "Maloya", coordinates: [30.75215459947422, 76.71780772481303] },
+    { name: "Ph-6", coordinates: [30.738507492657128, 76.71400896704844] },
+    { name: "Old Barrier", coordinates: [30.730006641621433, 76.72122372481212] },
+    { name: "Franco Hotel", coordinates: [30.726880258939516, 76.72390254967802] },
+    { name: "Badheri Chowk", coordinates: [30.74361930925134, 76.77103084310914] },
+    { name: "40/41", coordinates: [30.73473100402063, 76.73721628293497] },
+    { name: "41 mkt", coordinates: [30.731519501025268, 76.73813578175522] },
+    { name: "42 mkt", coordinates: [30.72534488117864, 76.74402281874195] }
+] : busId === '4' ? [
+    { name: "43/44", coordinates: [30.71881043817011, 76.75215456886062] },
+    { name: "42 mkt", coordinates: [30.72534488117864, 76.74402281874195] },
+    { name: "41 mkt", coordinates: [30.731519501025268, 76.73813578175522] },
+    { name: "41/40", coordinates: [30.74361930925134, 76.77103084310914] },
+    { name: "Badheri Chowk", coordinates: [30.74361930925134, 76.77103084310914] },
+    { name: "Franco Hotel", coordinates: [30.726880258939516, 76.72390254967802] },
+    { name: "Old Barrier", coordinates: [30.730006641621433, 76.72122372481212] },
+    { name: "Ph-6", coordinates: [30.738507492657128, 76.71400896704844] },
+    { name: "Maloya", coordinates: [30.75215459947422, 76.71780772481303] },
+    { name: "38west", coordinates: [30.748213424927606, 76.73553435364875] },
+    { name: "DMC", coordinates: [30.763417840136338, 76.73385764743266] },
+    { name: "Dhanas", coordinates: [30.76261029138625, 76.74537149746155] },
+    { name: "S/P Barrier", coordinates: [30.786319339200706, 76.75653427116416] },
+    { name: "Khuda Lahora", coordinates: [30.77882435166121, 76.77727742531765] },
+    { name: "PGI", coordinates: [30.760705429404684, 76.77497429200771] },
+    { name: "OPD", coordinates: [30.762307237971626, 76.78186218112053] },
+    { name: "10/16", coordinates: [30.75018996332409, 76.79005248471705] },
+    { name: "17/16", coordinates: [30.746324621179774, 76.7783121575263] },
+    { name: "ISBT-17", coordinates: [30.73688538321981, 76.77822524254265] },
+    { name: "Aroma", coordinates: [30.730702676792035, 76.77508182344779] },
+    { name: "34/35", coordinates: [30.72276845312314, 76.7618267193689] },
+    { name: "43/44", coordinates: [30.71881043817011, 76.75215456886062] }
+] : [];
+ [];
+
+        // Add stop markers to the map
+        stops.forEach(stop => {
+            L.marker(stop.coordinates, { icon: stopIcon }).addTo(map)
+                .bindPopup(stop.name);
+        });
+
+        const busTimings = JSON.parse(localStorage.getItem('busTimings'));
+const startTime = new Date(busTimings[`bus${busId}`]);
+const previousStartTime = localStorage.getItem(`bus${busId}_startTime`);
+const currentTime = new Date();
+
+// Check if the start time has changed
+if (!previousStartTime || new Date(previousStartTime).getTime() !== startTime.getTime()) {
+    // If the start time has changed, update the stored start time
+    localStorage.setItem(`bus${busId}_startTime`, startTime);
+}
+
+// Calculate the time difference using the updated start time
+const timeDifference = Math.floor((currentTime - startTime) / 1000); // Time difference in seconds
+
+
+
+
+
+        // Fetch route data from Geoapify Routing API
+        fetch(`https://api.geoapify.com/v1/routing?waypoints=${stops.map(stop => stop.coordinates.join(',')).join('|')}&mode=drive&apiKey=${apiKey}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('API Response:', data); // Log API response to debug
+
+                // Ensure route data is present
+                if (!data.features || !data.features[0] || !data.features[0].geometry || !data.features[0].geometry.coordinates) {
+                    throw new Error('Invalid route data received from API');
+                }
+
+                // Handle potential nested arrays
+                const route = data.features[0].geometry.coordinates.flat(); // Flatten the array if nested
+
+                // Convert coordinates to latLng format
+                const latLngs = route.map(coord => [coord[1], coord[0]]);
+
+                // Draw the route on the map
+                const routeLine = L.polyline(latLngs, { color: 'blue' }).addTo(map);
+
+                // Set up the bus marker
+                const busMarker = L.marker(latLngs[0], { icon: busIcon }).addTo(map);
+
+                // Extract duration from API response
+                const routeDuration = data.features[0].properties.time; // Duration in seconds from API
+
+                // Convert duration to milliseconds
+                const animationDuration = routeDuration * 1000; // Duration in milliseconds
+                const totalPoints = latLngs.length;
+
+                // Timer element
+                const timerElement = document.getElementById('timer');
+                const nextStopElement = document.getElementById('next-stop');
+
+                // Format seconds to mm:ss
+                function formatTime(seconds) {
+                    const mins = Math.floor(seconds / 60);
+                    const secs = Math.floor(seconds % 60);
+                    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                }
+
+                // Update the timer
+                let remainingTime = routeDuration - timeDifference; // Update the remaining time based on the elapsed time
+                function updateTimer() {
+                    timerElement.innerText = `Time to reach: ${formatTime(remainingTime)}`;
+                    if (remainingTime > 0) {
+                        remainingTime--;
+                        setTimeout(updateTimer, 1000); // Update every second
+                    }
+                }
+                updateTimer();
+
+                // Update map view function
+                function updateMapView(latLng) {
+                    map.setView(latLng, 15); // Adjust the zoom level as needed (e.g., 15 for zoomed in view)
+                }
+
+                // Animate the bus along the route
+                let i = Math.max(0, Math.floor((timeDifference / routeDuration) * totalPoints)); // Adjust starting point based on elapsed time
+let currentStopIndex = 0; // Start with the first stop (0)
+const stopProximity = 50; // Proximity in meters to consider as having "reached" a stop
+
+// Function to initialize the next stop based on the current position
+function initializeNextStop() {
+    const currentLatLng = L.latLng(latLngs[i]);
+    
+    // Find the closest stop to the current position
+    let closestStopIndex = -1;
+    let closestDistance = Infinity;
+
+    stops.forEach((stop, index) => {
+        const stopLatLng = L.latLng(stop.coordinates);
+        const distance = currentLatLng.distanceTo(stopLatLng);
+
+        if (distance < closestDistance) {
+            closestDistance = distance;
+            closestStopIndex = index;
+        }
+    });
+
+    // Set the currentStopIndex to the closest stop that is ahead
+    currentStopIndex = closestStopIndex > 0 ? closestStopIndex - 1 : closestStopIndex; // Always show one stop ahead
+    nextStopElement.innerText = `Next stop: ${stops[currentStopIndex].name}`;
+}
+
+// Update the next stop logic
+// Function to update the next stop
+// Update the next stop logic based on time
+function updateNextStop() {
+    const currentLatLng = L.latLng(latLngs[i]);
+
+    // Iterate through stops to find the next relevant stop
+    for (let j = currentStopIndex; j < stops.length; j++) {
+        const stopLatLng = L.latLng(stops[j].coordinates);
+        const stopIndex = j; // Store the stop index
+
+        // Calculate distance to the stop
+        const distanceToStop = currentLatLng.distanceTo(stopLatLng);
+        // Calculate time to the stop (assuming an average speed of, say, 30 km/h)
+        const averageSpeed = 30 * 1000 / 3600; // Convert km/h to m/s
+        const timeToStop = distanceToStop / averageSpeed; // Time in seconds
+
+        // Debug logs to check time calculation
+        console.log(`Current LatLng: ${currentLatLng}`);
+        console.log(`Checking stop: ${stops[stopIndex].name}`);
+        console.log(`Distance to stop: ${distanceToStop} meters`);
+        console.log(`Estimated time to stop: ${timeToStop.toFixed(2)} seconds`);
+        console.log(`Remaining time: ${remainingTime} seconds`);
+
+        // Check if the remaining time is less than the estimated time to reach the stop
+        if (remainingTime < timeToStop) {
+            // If bus has reached this stop, update the next stop index
+            currentStopIndex++;
+            if (currentStopIndex < stops.length) {
+                nextStopElement.innerText = `Next stop: ${stops[currentStopIndex].name}`;
+                console.log(`Updated next stop to: ${stops[currentStopIndex].name}`);
+            } else {
+                nextStopElement.innerText = `Next stop: ${stops[stops.length - 1].name} (Destination)`;
+                console.log(`Bus has reached the final destination: ${stops[stops.length - 1].name}`);
+            }
+            break; // Exit the loop after updating the next stop
+        }
+    }
+}
+
+// Initialize the next stop on page load
+initializeNextStop();
+
+
+
+
+                function moveBus() {
+                    if (i < totalPoints) {
+                        const currentLatLng = latLngs[i];
+                        busMarker.setLatLng(currentLatLng);
+                        updateMapView(currentLatLng);
+                        updateNextStop();
+                        i++;
+
+                        // Move the bus at the rate synchronized with the timer
+                        const frameDuration = animationDuration / totalPoints;
+                        setTimeout(moveBus, frameDuration);
+                    } else {
+                        nextStopElement.innerText = `Next stop: ${stops[stops.length - 1].name} (Destination)`;
+                    }
+                }
+                moveBus();
+            })
+            .catch(error => {
+                console.error('Error fetching route:', error);
+            });
+    </script>
+</body>
+</html>
